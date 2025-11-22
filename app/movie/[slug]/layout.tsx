@@ -87,7 +87,6 @@
 
 
 
-
 import type { Metadata } from 'next'
 import moviesData from '../../../data/data.json'
 
@@ -129,12 +128,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   const pageTitle = `${movie.title} (${movie.releaseYear}) - Watch Online Free`
   const pageDescription = movie.description.length > 160 ? movie.description.substring(0, 160) + '...' : movie.description
-
-  // CRITICAL: Make thumbnail URL absolute
-  let thumbnailUrl = movie.thumbnail
-  if (!thumbnailUrl.startsWith('http')) {
-    thumbnailUrl = `${SITE_URL}${thumbnailUrl.startsWith('/') ? '' : '/'}${thumbnailUrl}`
-  }
+  
+  // Ensure thumbnail URL is absolute
+  const thumbnailUrl = movie.thumbnail.startsWith('http') 
+    ? movie.thumbnail 
+    : `${SITE_URL}${movie.thumbnail.startsWith('/') ? '' : '/'}${movie.thumbnail}`
 
   return {
     title: pageTitle,
@@ -147,29 +145,30 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       images: [
         {
           url: thumbnailUrl,
-          width: 1200,
-          height: 630,
+          width: 384, // Your actual image width
+          height: 576, // Your actual image height
           alt: `Movie poster for ${movie.title}`,
+          type: 'image/jpeg',
         },
       ],
-      type: 'website', // CHANGED from 'video.movie' to 'website'
+      type: 'website', // Changed from 'video.movie' to 'website' for better compatibility
       url: `${SITE_URL}/movie/${movie.slug}`,
       siteName: 'Movie On Demand',
+      locale: 'en_US',
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary', // Changed to 'summary' for vertical images
       title: pageTitle,
       description: pageDescription,
       images: [thumbnailUrl],
+      creator: '@movieondemand',
+      site: '@movieondemand',
     },
     robots: 'index, follow',
+    alternates: {
+      canonical: `${SITE_URL}/movie/${movie.slug}`
+    },
   }
-}
-
-export async function generateStaticParams() {
-  return typedMoviesData.map((movie) => ({
-    slug: movie.slug,
-  }))
 }
 
 export default function MovieLayout({
