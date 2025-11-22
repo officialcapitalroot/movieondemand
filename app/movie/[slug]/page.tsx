@@ -797,13 +797,14 @@
 
 
 
-// app/movie/[slug]/page.tsx - Updated Telegram Section
+// app/movie/[slug]/page.tsx - Updated with Social Media Meta Tags
 "use client"
 
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Head from 'next/head'
 import moviesData from '../../../data/data.json'
 import Header from '../../../components/Header'
 import { RelatedMoviesGrid } from '../../../components/RelatedMovieCard'
@@ -833,6 +834,7 @@ interface Movie {
 
 const typedMoviesData = moviesData as Movie[]
 const TELEGRAM_BOT_USERNAME = "onlyondemand_bot";
+const SITE_URL = "https://movieondemand.vercel.app";
 
 export default function MoviePage({ params }: { params: { slug: string } }) {
   const movie = typedMoviesData.find((m: Movie) => m.slug === params.slug)
@@ -899,6 +901,11 @@ export default function MoviePage({ params }: { params: { slug: string } }) {
   const handleImageError = () => {
     setImageError(true)
   }
+
+  // Social media meta tags
+  const pageUrl = `${SITE_URL}/movie/${movie.slug}`
+  const pageTitle = `${movie.title} (${movie.releaseYear}) - Watch Online Free`
+  const pageDescription = movie.description.length > 160 ? movie.description.substring(0, 160) + '...' : movie.description
 
   if (showNotification && movie.category === 'Adult') {
     return (
@@ -1145,6 +1152,74 @@ export default function MoviePage({ params }: { params: { slug: string } }) {
 
   return (
     <>
+      <Head>
+        {/* Primary Meta Tags */}
+        <title>{pageTitle}</title>
+        <meta name="title" content={pageTitle} />
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={movie.tags.join(', ')} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content={movie.thumbnail} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`Movie poster for ${movie.title}`} />
+        <meta property="og:site_name" content="Movie On Demand" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={pageUrl} />
+        <meta property="twitter:title" content={pageTitle} />
+        <meta property="twitter:description" content={pageDescription} />
+        <meta property="twitter:image" content={movie.thumbnail} />
+        <meta property="twitter:image:alt" content={`Movie poster for ${movie.title}`} />
+
+        {/* Additional Meta Tags */}
+        <meta name="robots" content="index, follow" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="language" content="English" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="author" content="Movie On Demand" />
+
+        {/* Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Movie",
+              "name": movie.title,
+              "description": movie.description,
+              "image": movie.thumbnail,
+              "dateCreated": movie.uploadDate,
+              "director": {
+                "@type": "Person",
+                "name": movie.director
+              },
+              "actor": movie.cast.map(actor => ({
+                "@type": "Person",
+                "name": actor
+              })),
+              "genre": movie.genre.split(', '),
+              "duration": movie.duration,
+              "contentRating": movie.rating,
+              "copyrightYear": movie.releaseYear,
+              "countryOfOrigin": movie.country,
+              "inLanguage": movie.language,
+              "url": pageUrl,
+              "potentialAction": {
+                "@type": "WatchAction",
+                "target": pageUrl
+              }
+            })
+          }}
+        />
+      </Head>
+
       <Header />
       <main className="movie-details-container">
         <nav style={{ marginTop: "200px" }} className="container py-4" aria-label="Breadcrumb">
@@ -1301,35 +1376,6 @@ export default function MoviePage({ params }: { params: { slug: string } }) {
             )}
             currentMovieId={movie.id}
             title={`Similar ${movie.genre.split(',')[0]} Movies`}
-          />
-
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'Movie',
-                name: movie.title,
-                description: movie.description,
-                image: movie.thumbnail,
-                dateCreated: movie.uploadDate,
-                director: {
-                  '@type': 'Person',
-                  name: movie.director
-                },
-                actor: movie.cast.map(actor => ({
-                  '@type': 'Person',
-                  name: actor
-                })),
-                genre: movie.genre.split(', '),
-                duration: movie.duration,
-                contentRating: movie.rating,
-                copyrightYear: movie.releaseYear,
-                countryOfOrigin: movie.country,
-                inLanguage: movie.language,
-                typicalAgeRange: '18+'
-              })
-            }}
           />
 
           <script
