@@ -642,10 +642,6 @@
 
 
 
-
-
-
-
 // app/api/telegram/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -772,7 +768,8 @@ async function sendMovieLinks(chatId: number, movieSlug: string) {
 
   const videoLink = `${BASE_URL}/video/${movieSlug}`;
 
-  const text = `🎉 *Thank you for joining!* 🎉
+  // Send to user privately
+  const userText = `🎉 *Thank you for joining!* 🎉
 
 Here is your direct movie link for *${movieSlug}*:
 
@@ -786,7 +783,20 @@ Enjoy your movie! 🍿
 
 If you have any issues, please contact support.`;
 
-  await sendTelegramMessage(chatId, text);
+  await sendTelegramMessage(chatId, userText);
+
+  // ALSO POST THE LINK IN THE CHANNEL
+  const channelText = `🎬 *New Movie Available!* 🎬
+
+📺 *Direct Video Link:*
+${videoLink}
+
+⭐ *Download/Watch Now:*
+${BASE_URL}
+
+Enjoy! 🍿`;
+
+  await sendTelegramMessageToChannel(channelText);
 }
 
 async function sendDefaultMessage(chatId: number) {
@@ -826,5 +836,33 @@ async function sendTelegramMessage(chatId: number, text: string, replyMarkup?: a
     }
   } catch (error) {
     console.error('Error sending Telegram message:', error);
+  }
+}
+
+// NEW FUNCTION: Send message to channel
+async function sendTelegramMessageToChannel(text: string) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  
+  const body = {
+    chat_id: TELEGRAM_CHANNEL, // This sends to the channel instead of user
+    text: text,
+    parse_mode: 'Markdown',
+    disable_web_page_preview: false,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      console.error('Telegram API error (channel):', await response.text());
+    }
+  } catch (error) {
+    console.error('Error sending Telegram message to channel:', error);
   }
 }
