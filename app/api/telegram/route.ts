@@ -1131,12 +1131,10 @@
 
 
 
-
 // app/api/telegram/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHANNEL = process.env.TELEGRAM_CHANNEL;
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
 
 export async function POST(request: NextRequest) {
@@ -1184,9 +1182,7 @@ async function handleCallbackQuery(callbackQuery: any) {
 async function sendWelcomeMessage(chatId: number, movieSlug: string) {
   const welcomeText = `🎬 *Movie On Demand Bot* 🎬
 
-Click the button below to get your movie link instantly!
-
-🔒 *Note:* Links auto-delete after 5 minutes for security`;
+Click the button below to get your movie link:`;
 
   const keyboard = {
     inline_keyboard: [
@@ -1235,27 +1231,17 @@ Visit: ${BASE_URL}`;
 
   const videoLink = `${BASE_URL}/video/${movieSlug}`;
 
-  // Send to user with auto-delete timer
   const userText = `🎬 *Your Movie Link* 🎬
 
 📺 *Direct Video Link:*
 ${videoLink}
-
-⏰ *This message will auto-delete in 5 minutes*
 
 ⭐ *Website:*
 ${BASE_URL}
 
 Enjoy your movie! 🍿`;
 
-  const sentMessage = await sendTelegramMessage(chatId, userText);
-  
-  // Schedule auto-delete after 5 minutes (300,000 milliseconds)
-  if (sentMessage && sentMessage.message_id) {
-    setTimeout(async () => {
-      await deleteTelegramMessage(chatId, sentMessage.message_id);
-    }, 60000); // 5 minutes  - 300000
-  }
+  await sendTelegramMessage(chatId, userText);
 }
 
 async function sendDefaultMessage(chatId: number) {
@@ -1263,9 +1249,7 @@ async function sendDefaultMessage(chatId: number) {
 
 Available commands:
 /start - Get movie links
-/subscribe - Get access to movies
-
-🔒 Links auto-delete after 5 minutes for security`;
+/subscribe - Get access to movies`;
 
   await sendTelegramMessage(chatId, text);
 }
@@ -1297,39 +1281,10 @@ async function sendTelegramMessage(chatId: any, text: string, replyMarkup?: any)
       return null;
     } else {
       console.log('Message sent successfully to:', chatId);
-      return result.result; // Return the message object which contains message_id
+      return result.result;
     }
   } catch (error) {
     console.error('Error sending Telegram message:', error);
     return null;
-  }
-}
-
-async function deleteTelegramMessage(chatId: any, messageId: number) {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteMessage`;
-  
-  const body = {
-    chat_id: chatId,
-    message_id: messageId
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    const result = await response.json();
-    
-    if (!response.ok) {
-      console.error('Telegram API error (delete):', result);
-    } else {
-      console.log('Message deleted successfully:', messageId);
-    }
-  } catch (error) {
-    console.error('Error deleting Telegram message:', error);
   }
 }
