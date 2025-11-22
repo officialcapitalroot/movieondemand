@@ -150,15 +150,15 @@ export default function RootLayout({
       
         
         {/* Additional Script 1 */}
-        {/* <Script id="nap5k-script" strategy="afterInteractive">
-          {`(function(s){s.dataset.zone='10217362',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
-        </Script> */}
-
+        <Script id="nap5k-script" strategy="afterInteractive">
+          {`(function(s){s.dataset.zone='10224003',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+        </Script>
+{/* <script>(function(s){s.dataset.zone='10224003',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script> */}
         {/* Additional Script 2 */}
-        {/* <Script id="groleegni-script" strategy="afterInteractive">
-          {`(function(s){s.dataset.zone='10217364',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
-        </Script> */}
-
+        <Script id="groleegni-script" strategy="afterInteractive">
+          {`(function(s){s.dataset.zone='10224004',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+        </Script>
+{/* <script>(function(s){s.dataset.zone='10224004',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script> */}
        
         {children}
         <Footer />
