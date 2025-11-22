@@ -246,7 +246,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const pageTitle = `${movie.title} (${movie.releaseYear}) - Watch Online Free`
   const pageDescription = movie.description.length > 160 ? movie.description.substring(0, 160) + '...' : movie.description
   
-  // Ensure thumbnail URL is absolute
+  // Use your actual movie poster dimensions - typically 2:3 aspect ratio
   let thumbnailUrl = movie.thumbnail
   if (!thumbnailUrl.startsWith('http')) {
     thumbnailUrl = `${SITE_URL}${thumbnailUrl.startsWith('/') ? '' : '/'}${thumbnailUrl}`
@@ -255,33 +255,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: pageTitle,
     description: pageDescription,
-    keywords: movie.tags.join(', '),
     metadataBase: new URL(SITE_URL),
+    
     openGraph: {
       title: pageTitle,
       description: pageDescription,
+      url: `${SITE_URL}/movie/${movie.slug}`,
+      siteName: 'Movie On Demand',
       images: [
         {
           url: thumbnailUrl,
-          width: 800,
-          height: 600,
-          alt: `Poster for ${movie.title}`,
+          width: 500,  // Your actual poster width
+          height: 750, // Your actual poster height (2:3 ratio)
+          alt: `${movie.title} (${movie.releaseYear}) Movie Poster`,
         },
       ],
       type: 'website',
-      url: `${SITE_URL}/movie/${movie.slug}`,
-      siteName: 'Movie On Demand',
-      locale: 'en_US',
     },
+    
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
       images: [thumbnailUrl],
-    },
-    robots: 'index, follow',
-    alternates: {
-      canonical: `${SITE_URL}/movie/${movie.slug}`
     },
   }
 }
