@@ -89,22 +89,22 @@ export default function RootLayout({
         <meta name="revisit-after" content="1 days" />
         <meta name="rating" content="general" />
         <meta name="distribution" content="global" />
-        <meta name="google-site-verification" content="YCq885c0NImaJxQH2uq4XPr2sUSQbti5uv2MPTa3Yrg" />
+        <meta name="google-site-verification" content="f0ytofPk6osR1lyJdPSVjfoEpyQd5lgrUt9totCHxzM" />
         {/* Sitemap */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         
         {/* Additional Open Graph Tags */}
-        <meta property="og:site_name" content="Movie & Tvshow" />
+        <meta property="og:site_name" content="Movie On Demand" />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:url" content={baseUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:alt" content="Movie & Tvshow - On Demand & Request Any Movie via Telegram" />
+        <meta property="og:image:alt" content="Movie On Demand - On Demand & Request Any Movie via Telegram" />
         
         {/* Additional Twitter Tags */}
-        <meta name="twitter:image:alt" content="Movie & Tvshow - On Demand & Request Any Movie via Telegram" />
+        <meta name="twitter:image:alt" content="Movie On Demand - On Demand & Request Any Movie via Telegram" />
         
         {/* Structured Data */}
         <script
@@ -113,7 +113,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "Movie & Tvshow",
+              "name": "Movie On Demand",
               "url": baseUrl,
               "description": "Movie On Demand Service - Request any movie via Telegram by sending movie name, year, and language. We add requested movies within 24 hours.",
               "potentialAction": {
@@ -123,7 +123,7 @@ export default function RootLayout({
               },
               "publisher": {
                 "@type": "Organization",
-                "name": "Movie & Tvshow",
+                "name": "Movie On Demand",
                 "logo": {
                   "@type": "ImageObject",
                   "url": `${baseUrl}/logo.png`
@@ -136,7 +136,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-black text-white`}>
         {/* Google Analytics */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-DJ9EBBT26N"
+          src="https://www.googletagmanager.com/gtag/js?id=G-YWPL9LN3CG"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -144,9 +144,10 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-DJ9EBBT26N');
+            gtag('config', 'G-YWPL9LN3CG');
           `}
         </Script>
+      
         
         {/* Additional Script 1 */}
         {/* <Script id="nap5k-script" strategy="afterInteractive">
