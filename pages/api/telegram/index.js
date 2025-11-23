@@ -1,3 +1,4 @@
+// pages/api/telegram/index.js
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -5,11 +6,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const TELEGRAM_BOT_TOKEN = '8301219008:AAEkpHhFA_SxgGorgK-wJJQ2cHzkMOapt8c';
-  const BASE_URL = 'https://movieondemand.vercel.app';
+  const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
 
-  console.log('=== WEBHOOK RECEIVED ===');
-  console.log('Token:', TELEGRAM_BOT_TOKEN);
+  console.log('Webhook received request');
+  console.log('Token exists:', !!TELEGRAM_BOT_TOKEN);
 
   try {
     const update = req.body;
@@ -48,9 +49,6 @@ async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) 
   const data = callbackQuery.data;
 
   console.log(`Processing callback from ${chatId}: ${data}`);
-
-  // Answer callback query first
-  await answerCallbackQuery(callbackQuery.id, TELEGRAM_BOT_TOKEN);
 
   if (data.startsWith('movie_')) {
     const movieSlug = data.replace('movie_', '');
@@ -147,25 +145,5 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
   } catch (error) {
     console.error('Error sending Telegram message:', error);
     return null;
-  }
-}
-
-async function answerCallbackQuery(callbackQueryId, TELEGRAM_BOT_TOKEN) {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`;
-  
-  const body = {
-    callback_query_id: callbackQueryId
-  };
-
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-  } catch (error) {
-    console.error('Error answering callback query:', error);
   }
 }
