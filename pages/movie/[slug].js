@@ -1258,7 +1258,7 @@ import Footer from '../../components/Footer'
 import { RelatedMoviesGrid } from '../../components/RelatedMovieCard'
 import moviesData from '../../data/data.json'
 
-const TELEGRAM_BOT_USERNAME = "onlyondemand_bot";
+const TELEGRAM_BOT_USERNAME = "@onlyondemand_bot";
 const SITE_URL = "https://movieondemand.vercel.app";
 
 export default function MoviePage() {
