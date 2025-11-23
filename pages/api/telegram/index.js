@@ -1,15 +1,20 @@
-// pages/api/telegram.js
+// pages/api/telegram/index.js
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
+    console.log('Method not allowed:', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
 
+  console.log('Webhook received request');
+  console.log('Token exists:', !!TELEGRAM_BOT_TOKEN);
+
   try {
     const update = req.body;
+    console.log('Update received:', JSON.stringify(update, null, 2));
     
     if (update.message) {
       await handleMessage(update.message, TELEGRAM_BOT_TOKEN, BASE_URL);
@@ -28,12 +33,12 @@ async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
   const chatId = message.chat.id;
   const text = message.text || '';
 
+  console.log(`Processing message from ${chatId}: ${text}`);
+
   if (text.startsWith('/start')) {
     const parts = text.split(' ');
     const movieSlug = parts[1] || '';
     await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
-  } else if (text === '/subscribe') {
-    await askForMovieLink(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
   } else {
     await sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
   }
@@ -42,6 +47,8 @@ async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
 async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
   const chatId = callbackQuery.from.id;
   const data = callbackQuery.data;
+
+  console.log(`Processing callback from ${chatId}: ${data}`);
 
   if (data.startsWith('movie_')) {
     const movieSlug = data.replace('movie_', '');
@@ -58,7 +65,7 @@ Click the button below to get your movie link:`;
     inline_keyboard: [
       [
         {
-          text: '🎬 GET MOVIE LINK NOW',
+          text: '🎬 GET MOVIE LINK NOW 🎬',
           callback_data: movieSlug ? `movie_${movieSlug}` : 'no_movie'
         }
       ]
@@ -66,25 +73,6 @@ Click the button below to get your movie link:`;
   };
 
   await sendTelegramMessage(chatId, welcomeText, TELEGRAM_BOT_TOKEN, keyboard);
-}
-
-async function askForMovieLink(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  const text = `🎬 *Get Movie Link*
-
-Click below to get your movie link:`;
-
-  const keyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: '🎬 GET MOVIE LINK',
-          callback_data: 'no_movie'
-        }
-      ]
-    ]
-  };
-
-  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, keyboard);
 }
 
 async function sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
@@ -99,12 +87,12 @@ Visit: ${BASE_URL}`;
     return;
   }
 
-  const videoLink = `${BASE_URL}/video/${movieSlug}`;
+  const movieLink = `${BASE_URL}/movie/${movieSlug}`;
 
   const userText = `🎬 *Your Movie Link* 🎬
 
-📺 *Direct Video Link:*
-${videoLink}
+📺 *Movie Page:*
+${movieLink}
 
 ⭐ *Website:*
 ${BASE_URL}
@@ -118,8 +106,7 @@ async function sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
   const text = `🤖 *Movie On Demand Bot*
 
 Available commands:
-/start - Get movie links
-/subscribe - Get access to movies`;
+/start - Get movie links`;
 
   await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
 }
@@ -134,6 +121,8 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
     disable_web_page_preview: false,
     ...(replyMarkup && { reply_markup: replyMarkup })
   };
+
+  console.log('Sending message to Telegram API...');
 
   try {
     const response = await fetch(url, {
