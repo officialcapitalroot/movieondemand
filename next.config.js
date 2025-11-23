@@ -5,7 +5,7 @@ const nextConfig = {
   //   appDir: true,
   // },
     images: {
-    domains: ['i.ibb.co', 'imgbb.com', 'short.icu'],
+    domains: ['i.ibb.co', 'imgbb.com', 'api.telegram.org', 'movieondemand.vercel.app', 'short.icu'],
     unoptimized: true
   },
   trailingSlash: true,
