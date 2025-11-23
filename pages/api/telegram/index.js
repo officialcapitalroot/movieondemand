@@ -153,58 +153,170 @@
 
 
 // pages/api/telegram/index.js
+
+export const config = {
+  api: {
+    bodyParser: false, // IMPORTANT: Telegram webhook requires raw body
+  },
+};
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  // Only allow POST
+  if (req.method !== "POST") {
+    console.log("Method not allowed:", req.method);
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Read raw body because Telegram sends JSON as raw bytes
+  const rawBody = await getRawBody(req);
+  let update;
+
+  try {
+    update = JSON.parse(rawBody.toString());
+  } catch (err) {
+    console.error("Invalid JSON from Telegram:", err);
+    return res.status(400).json({ error: "Bad Request" });
   }
 
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://movieondemand.vercel.app";
 
-  console.log('=== WEBHOOK HIT ===');
-  console.log('Token:', TELEGRAM_BOT_TOKEN ? 'SET' : 'NOT SET');
+  console.log("Webhook triggered:", update);
 
   try {
-    const update = req.body;
-    console.log('Update:', JSON.stringify(update, null, 2));
-    
     if (update.message) {
-      const chatId = update.message.chat.id;
-      const text = update.message.text || '';
-      
-      console.log(`Message from ${chatId}: ${text}`);
-      
-      let responseText = '';
-      
-      if (text.startsWith('/start')) {
-        const parts = text.split(' ');
-        const movieSlug = parts[1] || '';
-        
-        if (movieSlug) {
-          responseText = `🎬 MOVIE LINK: ${BASE_URL}/video/${movieSlug}`;
-        } else {
-          responseText = `🤖 Bot is working! Visit: ${BASE_URL}`;
-        }
-      } else {
-        responseText = `Send /start to get movie links. Website: ${BASE_URL}`;
-      }
-      
-      // Send response
-      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: responseText,
-          parse_mode: 'Markdown'
-        })
-      });
+      await handleMessage(update.message, TELEGRAM_BOT_TOKEN, BASE_URL);
+    } else if (update.callback_query) {
+      await handleCallbackQuery(update.callback_query, TELEGRAM_BOT_TOKEN, BASE_URL);
     }
 
-    res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error processing webhook:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// ------------- RAW BODY PARSER (IMPORTANT FOR TELEGRAM) -------------
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = [];
+
+    req.on("data", chunk => data.push(chunk));
+    req.on("end", () => resolve(Buffer.concat(data)));
+    req.on("error", err => reject(err));
+  });
+}
+
+// ------------- MESSAGE HANDLER ----------------
+async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const chatId = message.chat.id;
+  const text = message.text || "";
+
+  console.log("Incoming message:", text);
+
+  if (text.startsWith("/start")) {
+    const parts = text.split(" ");
+    const movieSlug = parts[1] || "";
+    await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN);
+  } else {
+    await sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN);
+  }
+}
+
+// ------------- CALLBACK HANDLER ----------------
+async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const chatId = callbackQuery.from.id;
+  const data = callbackQuery.data;
+
+  console.log("Callback query:", data);
+
+  if (data.startsWith("movie_")) {
+    const movieSlug = data.replace("movie_", "");
+    await sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
+  }
+}
+
+// ------------- SEND WELCOME -------------
+async function sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN) {
+  const welcomeText = `🎬 *Movie On Demand Bot* 🎬
+
+Click the button below to get your movie link:`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: "🎬 GET MOVIE LINK NOW 🎬",
+          callback_data: movieSlug ? `movie_${movieSlug}` : "no_movie",
+        },
+      ],
+    ],
+  };
+
+  return sendTelegramMessage(chatId, welcomeText, TELEGRAM_BOT_TOKEN, keyboard);
+}
+
+// ------------- SEND MOVIE LINKS -------------
+async function sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  if (!movieSlug || movieSlug === "no_movie") {
+    return sendTelegramMessage(
+      chatId,
+      `❌ *No Movie Specified*
+
+Visit: ${BASE_URL}`,
+      TELEGRAM_BOT_TOKEN
+    );
+  }
+
+  const videoLink = `${BASE_URL}/video/${movieSlug}`;
+
+  const msg = `🎬 *Your Movie Link* 🎬
+
+📺 *Direct Video Link:*  
+${videoLink}
+
+⭐ *Website:*  
+${BASE_URL}
+
+🍿 Enjoy your movie!`;
+
+  return sendTelegramMessage(chatId, msg, TELEGRAM_BOT_TOKEN);
+}
+
+// ------------- DEFAULT MESSAGE -------------
+async function sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN) {
+  const text = `🤖 *Movie On Demand Bot*
+
+Available commands:  
+/start - Get movie links`;
+
+  return sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
+}
+
+// ------------- SEND TELEGRAM MESSAGE -------------
+async function sendTelegramMessage(chatId, text, token, replyMarkup) {
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+  const body = {
+    chat_id: chatId,
+    text,
+    parse_mode: "Markdown",
+    ...(replyMarkup && { reply_markup: replyMarkup }),
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const json = await res.json();
+    console.log("Telegram response:", json);
+
+    return json;
+  } catch (err) {
+    console.error("Error sending Telegram message:", err);
   }
 }
