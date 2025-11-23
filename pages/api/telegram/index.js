@@ -12,15 +12,8 @@ export default async function handler(req, res) {
     const update = req.body;
     console.log('Update:', JSON.stringify(update, null, 2));
     
-    // AUTO-SEND WELCOME MESSAGE FOR ANY MESSAGE RECEIVED
     if (update.message) {
-      const chatId = update.message.chat.id;
-      const text = update.message.text || '';
-      
-      console.log(`Auto-sending welcome to ${chatId}`);
-      
-      // IGNORE /start COMMAND - JUST SEND THE WELCOME MESSAGE DIRECTLY
-      await sendWelcomeMessage(chatId, '', TELEGRAM_BOT_TOKEN, BASE_URL);
+      await handleMessage(update.message, TELEGRAM_BOT_TOKEN, BASE_URL);
     } else if (update.callback_query) {
       await handleCallbackQuery(update.callback_query, TELEGRAM_BOT_TOKEN, BASE_URL);
     }
@@ -30,6 +23,18 @@ export default async function handler(req, res) {
     console.error('Telegram webhook error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+}
+
+async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const chatId = message.chat.id;
+  const text = message.text || '';
+
+  console.log(`Processing message from ${chatId}: ${text}`);
+
+  // AUTO-SEND WELCOME MESSAGE FOR ANY MESSAGE - NO /start NEEDED
+  const parts = text.split(' ');
+  const movieSlug = parts[1] || '';
+  await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
 }
 
 async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
@@ -51,9 +56,9 @@ async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) 
 async function sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
   const welcomeText = `🎬 *Movie On Demand Bot* 🎬
 
-Get your movie links instantly!
+Get instant movie links directly in Telegram!
 
-Click below to get started:`;
+Click below to get your movie link:`;
 
   const keyboard = {
     inline_keyboard: [
@@ -95,6 +100,9 @@ Click "Get Telegram Link" on any movie page!`;
 
 📺 *Direct Video Link:*
 ${videoLink}
+
+⭐ *Website:*
+${BASE_URL}
 
 Enjoy your movie! 🍿`;
 
