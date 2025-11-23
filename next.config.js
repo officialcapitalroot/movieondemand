@@ -7,8 +7,8 @@ const nextConfig = {
     images: {
     domains: ['i.ibb.co', 'imgbb.com', 'short.icu'],
     unoptimized: true
-  },
-  trailingSlash: true,
+  }
+  
 } 
 
 module.exports = nextConfig
