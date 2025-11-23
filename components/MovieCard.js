@@ -22,7 +22,8 @@ export default function MovieCard({ movie }) {
             width={300}
             height={450}
             quality={100}
-             loading="lazy"
+            fetchpriority="high"
+            loading="eager"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
           
