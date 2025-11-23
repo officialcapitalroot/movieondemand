@@ -5,8 +5,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const TELEGRAM_BOT_TOKEN = '8301219008:AAEkpHhFA_SxgGorgK-wJJQ2cHzkMOapt8c';
-  const BASE_URL = 'https://movieondemand.vercel.app';
+  const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
+
 
   console.log('=== WEBHOOK RECEIVED ===');
 
