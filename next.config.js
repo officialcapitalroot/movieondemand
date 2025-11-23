@@ -3,7 +3,7 @@
 const nextConfig = {
   
   images: {
-    domains: ['i.ibb.co', 'imgbb.com', 'movieondemand.vercel.app', 'short.icu'],
+    domains: ['movieondemand.vercel.app', 'short.icu'],
   },
 }
 
