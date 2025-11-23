@@ -1363,7 +1363,7 @@ export default function MoviePage() {
 
   const absoluteThumbnail = getAbsoluteThumbnailUrl(movie.thumbnail);
   const currentUrl = `${SITE_URL}/movie/${movie.slug}`;
-  const shareTitle = `${movie.title} (${movie.releaseYear}) - Watch Online Free`;
+  const shareTitle = `${movie.title} - Watch Online Free`;
   const shareDescription = movie.description;
 
   // Generate article schema
