@@ -10,10 +10,15 @@ export default async function handler(req, res) {
 
   try {
     const update = req.body;
-    console.log('Update:', JSON.stringify(update, null, 2));
+    console.log('Full update:', JSON.stringify(update, null, 2));
     
+    // AUTO-RESPOND TO ANY MESSAGE - NO COMMAND CHECKING
     if (update.message) {
-      await handleMessage(update.message, TELEGRAM_BOT_TOKEN, BASE_URL);
+      const chatId = update.message.chat.id;
+      const text = update.message.text || '';
+      
+      console.log(`Auto-responding to ${chatId} with welcome message`);
+      await sendWelcomeMessage(chatId, '', TELEGRAM_BOT_TOKEN, BASE_URL);
     } else if (update.callback_query) {
       await handleCallbackQuery(update.callback_query, TELEGRAM_BOT_TOKEN, BASE_URL);
     }
@@ -23,18 +28,6 @@ export default async function handler(req, res) {
     console.error('Telegram webhook error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-}
-
-async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  const chatId = message.chat.id;
-  const text = message.text || '';
-
-  console.log(`Processing message from ${chatId}: ${text}`);
-
-  // AUTO-SEND WELCOME MESSAGE FOR ANY MESSAGE - NO /start NEEDED
-  const parts = text.split(' ');
-  const movieSlug = parts[1] || '';
-  await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
 }
 
 async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
@@ -58,14 +51,14 @@ async function sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_UR
 
 Get instant movie links directly in Telegram!
 
-Click below to get your movie link:`;
+Click below to get started:`;
 
   const keyboard = {
     inline_keyboard: [
       [
         {
           text: '🎬 GET MOVIE LINK 🎬',
-          callback_data: movieSlug ? `movie_${movieSlug}` : 'no_movie'
+          callback_data: 'no_movie'
         }
       ],
       [
@@ -81,19 +74,6 @@ Click below to get your movie link:`;
 }
 
 async function sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  if (!movieSlug || movieSlug === 'no_movie') {
-    const text = `📺 *Browse Movies*
-
-Visit our website to find movies and get direct links:
-
-${BASE_URL}
-
-Click "Get Telegram Link" on any movie page!`;
-    
-    await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
-    return;
-  }
-
   const videoLink = `${BASE_URL}/video/${movieSlug}`;
 
   const userText = `🎬 *Movie Link Ready!* 🎬
@@ -107,6 +87,18 @@ ${BASE_URL}
 Enjoy your movie! 🍿`;
 
   await sendTelegramMessage(chatId, userText, TELEGRAM_BOT_TOKEN);
+}
+
+async function sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const text = `📺 *Browse Movies*
+
+Visit our website to find movies and get direct links:
+
+${BASE_URL}
+
+Click "Get Telegram Link" on any movie page!`;
+  
+  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
 }
 
 async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup) {
