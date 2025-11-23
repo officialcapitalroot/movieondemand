@@ -553,6 +553,33 @@ export default function MoviePage() {
 
   return (
     <>
+      <Head>
+        <title>{shareTitle}</title>
+        <meta name="description" content={shareDescription} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={shareTitle} />
+        <meta property="og:description" content={shareDescription} />
+        <meta property="og:image" content={absoluteThumbnail} />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="1200" />
+        <meta property="og:site_name" content="Movie On Demand" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={currentUrl} />
+        <meta property="twitter:title" content={shareTitle} />
+        <meta property="twitter:description" content={shareDescription} />
+        <meta property="twitter:image" content={absoluteThumbnail} />
+        
+        {/* Additional Meta Tags */}
+        <meta name="keywords" content={`${movie.title}, ${movie.genre}, ${movie.releaseYear}, watch online, free streaming`} />
+        <link rel="canonical" href={currentUrl} />
+      </Head>
+
       <Header />
       <main className="min-h-screen bg-black pt-20">
         <div className="container mx-auto px-4 py-8">
