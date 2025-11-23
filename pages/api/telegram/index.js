@@ -367,15 +367,8 @@ async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
 
   console.log(`Processing message from ${chatId}: ${text}`);
 
-  if (text.startsWith('/start')) {
-    const parts = text.split(' ');
-    const movieSlug = parts[1] || '';
-    await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
-  } else if (text === '/help') {
-    await sendHelpMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
-  } else {
-    await sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
-  }
+  // AUTO-SEND WELCOME MESSAGE WHEN USER OPENS CHAT - NO /start NEEDED
+  await sendWelcomeMessage(chatId, '', TELEGRAM_BOT_TOKEN, BASE_URL);
 }
 
 async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
@@ -397,21 +390,21 @@ async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) 
 async function sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
   const welcomeText = `🎬 *Movie On Demand Bot* 🎬
 
-Welcome! I can help you get direct movie links.
+Get instant access to movie links directly in Telegram!
 
-Click the button below to get your movie link:`;
+Click below to get started:`;
 
   const keyboard = {
     inline_keyboard: [
       [
         {
-          text: '🎬 GET MOVIE LINK NOW 🎬',
+          text: '🎬 GET MOVIE LINK 🎬',
           callback_data: movieSlug ? `movie_${movieSlug}` : 'no_movie'
         }
       ],
       [
         {
-          text: '🌐 Visit Our Website',
+          text: '🌐 VISIT WEBSITE',
           url: BASE_URL
         }
       ]
@@ -423,20 +416,24 @@ Click the button below to get your movie link:`;
 
 async function sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
   if (!movieSlug || movieSlug === 'no_movie') {
-    await sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
+    const text = `📺 *Browse Movies*
+
+Visit our website to find movies and get direct links:
+
+${BASE_URL}
+
+Click "Get Telegram Link" on any movie page to get the direct video link here!`;
+    
+    await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
     return;
   }
 
   const videoLink = `${BASE_URL}/video/${movieSlug}`;
-  const moviePageLink = `${BASE_URL}/movie/${movieSlug}`;
 
-  const userText = `🎬 *Your Movie Link* 🎬
+  const userText = `🎬 *Movie Link Ready!* 🎬
 
 📺 *Direct Video Link:*
 ${videoLink}
-
-🎭 *Movie Page:*
-${moviePageLink}
 
 ⭐ *Website:*
 ${BASE_URL}
@@ -444,51 +441,6 @@ ${BASE_URL}
 Enjoy your movie! 🍿`;
 
   await sendTelegramMessage(chatId, userText, TELEGRAM_BOT_TOKEN);
-}
-
-async function sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  const text = `❌ *No Movie Specified*
-
-Please use the correct link from our website to get a specific movie.
-
-Visit our website and click on "Get Telegram Link" for any movie to get the direct video link.
-
-🌐 *Website:* ${BASE_URL}`;
-  
-  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
-}
-
-async function sendHelpMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  const text = `🤖 *Movie On Demand Bot Help*
-
-*Available Commands:*
-/start - Get started with the bot
-/help - Show this help message
-
-*How to use:*
-1. Visit our website: ${BASE_URL}
-2. Find a movie you want to watch
-3. Click on "Get Telegram Link"
-4. You'll be redirected to this bot with the movie link
-5. Click the button to get your direct video link
-
-Need help? Contact us through our website!`;
-
-  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
-}
-
-async function sendDefaultMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
-  const text = `🤖 *Movie On Demand Bot*
-
-I can help you get direct movie links from our website.
-
-*Available commands:*
-/start - Get started with movie links
-/help - Show help information
-
-Visit our website to browse movies: ${BASE_URL}`;
-
-  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
 }
 
 async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup) {
