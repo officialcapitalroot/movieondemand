@@ -5,10 +5,10 @@ const nextConfig = {
   //   appDir: true,
   // },
     images: {
-    domains: ['i.ibb.co', 'imgbb.com', 'api.telegram.org', 'movieondemand.vercel.app', 'short.icu'],
+    domains: ['i.ibb.co', 'imgbb.com', 'movieondemand.vercel.app', 'short.icu'],
     unoptimized: true
   },
   trailingSlash: true,
-}
+} 
 
 module.exports = nextConfig
