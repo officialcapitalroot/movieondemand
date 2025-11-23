@@ -1,5 +1,3 @@
-
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -8,6 +6,10 @@ export default async function handler(req, res) {
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
 
+  if (!TELEGRAM_BOT_TOKEN) {
+    console.error("❌ TELEGRAM_BOT_TOKEN is missing in environment variables!");
+    return res.status(500).json({ error: "Bot token missing" });
+  }
 
   console.log('=== WEBHOOK RECEIVED ===');
 
@@ -34,7 +36,6 @@ async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
 
   console.log(`Processing message from ${chatId}: ${text}`);
 
-  // AUTO-SEND WELCOME MESSAGE WHEN USER OPENS CHAT - NO /start NEEDED
   await sendWelcomeMessage(chatId, '', TELEGRAM_BOT_TOKEN, BASE_URL);
 }
 
@@ -90,7 +91,7 @@ Visit our website to find movies and get direct links:
 ${BASE_URL}
 
 Click "Get Telegram Link" on any movie page to get the direct video link here!`;
-    
+
     await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
     return;
   }
@@ -126,9 +127,7 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
 
@@ -141,6 +140,7 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
       console.log('Message sent successfully to:', chatId);
       return result.result;
     }
+
   } catch (error) {
     console.error('Error sending Telegram message:', error);
     return null;
@@ -157,17 +157,13 @@ async function answerCallbackQuery(callbackQueryId, TELEGRAM_BOT_TOKEN) {
   try {
     await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
   } catch (error) {
     console.error('Error answering callback query:', error);
   }
 }
-
-
 
 
 
