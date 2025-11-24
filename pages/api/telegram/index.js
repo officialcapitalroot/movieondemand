@@ -3,12 +3,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Use environment variables for security
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://movieondemand.vercel.app';
 
+  // Security: Validate environment variables
   if (!TELEGRAM_BOT_TOKEN) {
-    console.error("❌ TELEGRAM_BOT_TOKEN is missing in environment variables!");
-    return res.status(500).json({ error: "Bot token missing" });
+    console.error('TELEGRAM_BOT_TOKEN environment variable is missing');
+    return res.status(500).json({ error: 'Server configuration error' });
   }
 
   console.log('=== WEBHOOK RECEIVED ===');
@@ -36,7 +38,15 @@ async function handleMessage(message, TELEGRAM_BOT_TOKEN, BASE_URL) {
 
   console.log(`Processing message from ${chatId}: ${text}`);
 
-  await sendWelcomeMessage(chatId, '', TELEGRAM_BOT_TOKEN, BASE_URL);
+  // Extract movie slug from /start command if present
+  let movieSlug = '';
+  if (text.startsWith('/start')) {
+    const parts = text.split(' ');
+    movieSlug = parts[1] || '';
+  }
+
+  // AUTO-SEND WELCOME MESSAGE WHEN USER OPENS CHAT
+  await sendWelcomeMessage(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
 }
 
 async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) {
@@ -49,7 +59,12 @@ async function handleCallbackQuery(callbackQuery, TELEGRAM_BOT_TOKEN, BASE_URL) 
 
   if (data.startsWith('movie_')) {
     const movieSlug = data.replace('movie_', '');
-    await sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
+    // Security: Validate movie slug format (alphanumeric and hyphens only)
+    if (/^[a-zA-Z0-9-]+$/.test(movieSlug)) {
+      await sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL);
+    } else {
+      await sendErrorMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
+    }
   } else if (data === 'no_movie') {
     await sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
   }
@@ -84,15 +99,7 @@ Click below to get started:`;
 
 async function sendMovieLinks(chatId, movieSlug, TELEGRAM_BOT_TOKEN, BASE_URL) {
   if (!movieSlug || movieSlug === 'no_movie') {
-    const text = `📺 *Browse Movies*
-
-Visit our website to find movies and get direct links:
-
-${BASE_URL}
-
-Click "Get Telegram Link" on any movie page to get the direct video link here!`;
-
-    await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
+    await sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL);
     return;
   }
 
@@ -111,6 +118,28 @@ Enjoy your movie! 🍿`;
   await sendTelegramMessage(chatId, userText, TELEGRAM_BOT_TOKEN);
 }
 
+async function sendNoMovieMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const text = `📺 *Browse Movies*
+
+Visit our website to find movies and get direct links:
+
+${BASE_URL}
+
+Click "Get Telegram Link" on any movie page to get the direct video link here!`;
+  
+  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
+}
+
+async function sendErrorMessage(chatId, TELEGRAM_BOT_TOKEN, BASE_URL) {
+  const text = `❌ *Invalid Request*
+
+Please use the website to get valid movie links:
+
+${BASE_URL}`;
+  
+  await sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN);
+}
+
 async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   
@@ -127,7 +156,9 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(body),
     });
 
@@ -140,7 +171,6 @@ async function sendTelegramMessage(chatId, text, TELEGRAM_BOT_TOKEN, replyMarkup
       console.log('Message sent successfully to:', chatId);
       return result.result;
     }
-
   } catch (error) {
     console.error('Error sending Telegram message:', error);
     return null;
@@ -157,14 +187,15 @@ async function answerCallbackQuery(callbackQueryId, TELEGRAM_BOT_TOKEN) {
   try {
     await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(body),
     });
   } catch (error) {
     console.error('Error answering callback query:', error);
   }
 }
-
 
 
 
