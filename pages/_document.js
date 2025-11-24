@@ -50,14 +50,14 @@ export default function Document() {
         <meta name="twitter:image" content={`${baseUrl}/og-image.jpg`} />
         <meta name="twitter:image:alt" content="Movie On Demand - Movie within 24 hours." />
                 {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJEF0RJQF"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-YWPL9LN3CG"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-KGJEF0RJQF', {
+              gtag('config', 'G-YWPL9LN3CG', {
                 page_title: document.title,
                 page_location: window.location.href,
                 anonymize_ip: true
