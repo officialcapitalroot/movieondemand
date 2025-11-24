@@ -55,7 +55,7 @@ export default function App({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="theme-color" content="#e50914" />
-        <link rel="canonical" href={`https://capitalroot.vercel.app${router.asPath}`} />
+        <link rel="canonical" href={`https://movieondemand.vercel.app${router.asPath}`} />
       </Head>
       <Component {...pageProps} />
     </> 
