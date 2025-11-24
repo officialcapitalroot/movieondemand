@@ -29,26 +29,26 @@ export default function Document() {
         <meta name="google-site-verification" content="f0ytofPk6osR1lyJdPSVjfoEpyQd5lgrUt9totCHxzM" />
         <meta name="author" content="Movie On Demand" />
         {/* Open Graph Meta Tags */}
-        <meta property="og:site_name" content="Movie On Demand" />
+        <meta property="og:site_name" content="Movie On Demand - Movie within 24 hours." />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="en_US" />
-        <meta property="og:title" content="Movie On Demand - movies within 24 hours." />
+        <meta property="og:title" content="Movie On Demand - Movie within 24 hours." />
         <meta property="og:description" content="Request any movie via Telegram by sending movie name, year, and language. We add requested movies within 24 hours." />
         <meta property="og:url" content={baseUrl} />
         <meta property="og:image" content={`${baseUrl}/og-image.jpg`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:alt" content="Movie On Demand - movies within 24 hours." />
+        <meta property="og:image:alt" content="Movie On Demand - Movie within 24 hours." />
         
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:creator" content="@cmovieondemand" />
         <meta name="twitter:site" content="@cmovieondemand" />
-        <meta name="twitter:title" content="Movie On Demand - movies within 24 hours." />
+        <meta name="twitter:title" content="Movie On Demand - Movie within 24 hours." />
         <meta name="twitter:description" content="Request any movie via Telegram by sending movie name, year, and language. We add requested movies within 24 hours." />
         <meta name="twitter:image" content={`${baseUrl}/og-image.jpg`} />
-        <meta name="twitter:image:alt" content="Movie On Demand - movies within 24 hours." />
+        <meta name="twitter:image:alt" content="Movie On Demand - Movie within 24 hours." />
                 {/* Google Analytics */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJEF0RJQF"></script>
         <script
