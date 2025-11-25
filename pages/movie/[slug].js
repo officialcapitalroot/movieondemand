@@ -1138,7 +1138,7 @@ export default function MoviePage() {
               {TELEGRAM_BOT_USERNAME && (
                 <div className="w-full max-w-md">
                   <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                    <h3 className="text-xl font-bold mb-3 text-white text-center">Get Link via Telegram</h3>
+                    <h3 className="text-xl font-bold mb-3 text-white text-center">Get Link via Telegram Full Complete Movie or TvShow.</h3>
                     <div className="space-y-4">
                       <p className="text-sm text-gray-300 text-center">
                         Click below to get this movie link via Telegram
