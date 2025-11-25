@@ -18,12 +18,14 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['i.ibb.co', 'imgbb.com', 'short.icu', 'i.ytimg.com', 'img.youtube.com'],
-    formats: ['image/webp', 'image/avif'],
-    unoptimized: true, 
+    unoptimized: true,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  //   unoptimized: true, 
+  //   deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  //   imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  // },
   async headers() {
     return [
       {
