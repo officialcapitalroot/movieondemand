@@ -251,6 +251,127 @@
 
 
 
+// import { useEffect, useRef } from 'react'
+
+// export default function YouTubePlayer({ videoId, title, autoplay = false }) {
+//   const playerRef = useRef(null)
+//   const playerInstanceRef = useRef(null)
+
+//   useEffect(() => {
+//     if (!videoId) {
+//       console.error('YouTubePlayer: No videoId provided')
+//       return
+//     }
+
+//     // Clean video ID - remove any URL parameters or invalid characters
+//     const cleanVideoId = videoId.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 11)
+    
+//     if (!cleanVideoId) {
+//       console.error('YouTubePlayer: Invalid videoId after cleaning:', videoId)
+//       return
+//     }
+
+//     console.log('Loading YouTube video with ID:', cleanVideoId)
+
+//     // Load the IFrame Player API code asynchronously
+//     if (!window.YT) {
+//       const tag = document.createElement('script')
+//       tag.src = "https://www.youtube.com/player_api"
+//       const firstScriptTag = document.getElementsByTagName('script')[0]
+//       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+//     }
+
+//     // Replace the player element with an iframe and YouTube player
+//     window.onYouTubePlayerAPIReady = function() {
+//       if (!playerRef.current) return
+      
+//       try {
+//         playerInstanceRef.current = new YT.Player(playerRef.current, {
+//           height: '100%',
+//           width: '100%',
+//           filter: 'url(#ultraSharp) brightness(1.25) contrast(1.15) saturate(1.5) hue-rotate(5deg)',
+//           transform: 'translateZ(0)',
+//           imageRendering: 'pixelated',
+//           videoId: cleanVideoId,
+//           playerVars: {
+//             'autoplay': 1,
+//             'controls': 1,
+//             'rel': 0,
+//             'showinfo': 0,
+//             'modestbranding': 1,
+//             'playsinline': 1,
+//             'loop': 1, // Enable looping
+//             'playlist': cleanVideoId // Required for loop to work with single video
+//           },
+//           events: {
+//             'onReady': function(event) {
+//               console.log('YouTube Player Ready for video:', cleanVideoId)
+//               // Ensure looping is enabled
+//               event.target.setLoop(true);
+//             },
+//             'onStateChange': function(event) {
+//               // Handle state changes if needed
+//               if (event.data === YT.PlayerState.ENDED) {
+//                 // Restart the video when it ends
+//                 event.target.playVideo();
+//               }
+//             },
+//             'onError': function(event) {
+//               console.error('YouTube Player Error:', event.data)
+//             }
+//           }
+//         })
+//       } catch (error) {
+//         console.error('Failed to initialize YouTube player:', error)
+//       }
+//     }
+
+//     // If API is already loaded, initialize immediately
+//     if (window.YT && window.YT.Player) {
+//       window.onYouTubePlayerAPIReady()
+//     }
+
+//     return () => {
+//       // Cleanup
+//       if (playerInstanceRef.current && playerInstanceRef.current.destroy) {
+//         playerInstanceRef.current.destroy()
+//       }
+//       window.onYouTubePlayerAPIReady = null
+//     }
+//   }, [videoId, autoplay])
+
+//   if (!videoId) {
+//     return (
+//       <div className="w-full h-full bg-black flex items-center justify-center text-white rounded-lg">
+//         <div className="text-center">
+//           <p>No video ID provided</p>
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div 
+//       ref={playerRef}
+//       id="ytplayer"
+//       className="w-full h-full bg-black rounded-lg overflow-hidden"
+//       style={{ minHeight: '400px' }}
+//     >
+//       <div className="w-full h-full flex items-center justify-center text-white">
+//         <div className="text-center">
+//           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+//           <p>Loading YouTube Player...</p>
+//           <p className="text-sm text-gray-400 mt-2">Video ID: {videoId}</p>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+
+
+
+
 import { useEffect, useRef } from 'react'
 
 export default function YouTubePlayer({ videoId, title, autoplay = false }) {
@@ -351,22 +472,124 @@ export default function YouTubePlayer({ videoId, title, autoplay = false }) {
   }
 
   return (
-    <div 
-      ref={playerRef}
-      id="ytplayer"
-      className="w-full h-full bg-black rounded-lg overflow-hidden"
-      style={{ minHeight: '400px' }}
-    >
-      <div className="w-full h-full flex items-center justify-center text-white">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p>Loading YouTube Player...</p>
-          <p className="text-sm text-gray-400 mt-2">Video ID: {videoId}</p>
+    <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
+      <div 
+        ref={playerRef}
+        id="ytplayer"
+        className="w-full h-full"
+      >
+        <div className="w-full h-full flex items-center justify-center text-white">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p>Loading YouTube Player...</p>
+            <p className="text-sm text-gray-400 mt-2">Video ID: {videoId}</p>
+          </div>
         </div>
       </div>
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
