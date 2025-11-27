@@ -192,18 +192,23 @@
 //     });
 //   }
 
-//   // Render video player based on source
+//   // Render video player based on source - ONLY if videoSource exists and is not "-"
 //   const renderVideoPlayer = () => {
-//     if (!movie.videoSource) {
+//     // Check if videoSource is missing, empty, or equals "-"
+//     if (!movie.videoSource || movie.videoSource === "-" || movie.videoSource === "" || !movie.videoId) {
 //       return (
 //         <div className="w-full aspect-video bg-gray-900 flex items-center justify-center rounded-lg">
-//           <div className="text-center text-white">
-//             <p className="text-xl">No video source available</p>
+//           <div className="text-center text-white p-8">
+//             <div className="text-6xl mb-4">🎬</div>
+//             <h3 className="text-xl font-bold mb-2">Video Not Available</h3>
+//             <p className="text-gray-400">This movie is currently not available for streaming.</p>
+//             <p className="text-gray-400 text-sm mt-2">Please check back later or try another movie.</p>
 //           </div>
 //         </div>
 //       )
 //     }
 
+//     // If videoSource exists and is valid, render the appropriate player
 //     if (movie.videoSource === 'dailymotion') {
 //       return <DailymotionPlayer videoId={movie.videoId} title={movie.title} autoplay={false} />
 //     } else if (movie.videoSource === 'youtube') {
@@ -212,6 +217,9 @@
 //       return <ShortICUPlayer videoId={movie.videoId} title={movie.title} />
 //     }
 //   }
+
+//   // Check if video player should be displayed
+//   const shouldShowVideoPlayer = movie.videoSource && movie.videoSource !== "-" && movie.videoSource !== "" && movie.videoId;
 
 //   if (showNotification && movie.category === 'Adult') {
 //     return (
@@ -318,15 +326,17 @@
       
 //       <main className="pt-20 min-h-screen">
 //         <div className="container mx-auto px-4 py-8">
-//           {/* Video Player Section */}
-//           <section className="mb-8" aria-labelledby="player-heading">
-//             <h2 id="player-heading" className="sr-only">
-//               Video Player for {movie.title}
-//             </h2>
-//             <div className="aspect-video w-full max-w-6xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl">
-//               {renderVideoPlayer()}
-//             </div>
-//           </section>
+//           {/* Video Player Section - ONLY show if shouldShowVideoPlayer is true */}
+//           {shouldShowVideoPlayer && (
+//             <section className="mb-8" aria-labelledby="player-heading">
+//               <h2 id="player-heading" className="sr-only">
+//                 Video Player for {movie.title}
+//               </h2>
+//               <div className="aspect-video w-full max-w-6xl mx-auto bg-black rounded-lg overflow-hidden shadow-2xl">
+//                 {renderVideoPlayer()}
+//               </div>
+//             </section>
+//           )}
 
 //           {/* Social Sharing Buttons */}
 //           <section className="mb-6">
@@ -379,7 +389,7 @@
 //               {TELEGRAM_BOT_USERNAME && (
 //                 <div className="w-full max-w-md">
 //                   <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-//                     <h3 className="text-xl font-bold mb-3 text-white text-center">Get Link via Telegram</h3>
+//                     <h3 className="text-xl font-bold mb-3 text-white text-center">Get Link via Telegram Full Complete Movie or TvShow.</h3>
 //                     <div className="space-y-4">
 //                       <p className="text-sm text-gray-300 text-center">
 //                         Click below to get this movie link via Telegram
@@ -730,23 +740,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -763,11 +756,9 @@ import moviesData from '../../data/data.json'
 const TELEGRAM_BOT_USERNAME = "onlyondemand_bot";
 const SITE_URL = "https://movieondemand.vercel.app";
 
-export default function MoviePage() {
+export default function MoviePage({ movie }) {
   const router = useRouter()
-  const { slug } = router.query
   
-  const movie = moviesData.find(m => m.slug === slug)
   const [isAgeVerified, setIsAgeVerified] = useState(false)
   const [showNotification, setShowNotification] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
