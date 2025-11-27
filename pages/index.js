@@ -1006,128 +1006,18 @@ export default function Home({ movies }) {
     setSearchResultsLimit(prev => prev + 15)
   }
 
-  // Generate absolute thumbnail URL
-  const getAbsoluteThumbnailUrl = (thumbnail) => {
-    if (!thumbnail) return `${SITE_URL}/fallback-image.jpg`;
-    
-    if (thumbnail.startsWith('http')) {
-      return thumbnail;
+  // Website Structured Data
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": siteName,
+    "description": siteDescription,
+    "url": canonicalUrl,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${canonicalUrl}/?search={search_term_string}`,
+      "query-input": "required name=search_term_string"
     }
-    
-    if (thumbnail.startsWith('/')) {
-      return `${SITE_URL}${thumbnail}`;
-    }
-    
-    return `${SITE_URL}/${thumbnail}`;
-  }
-
-  // Generate movie URL
-  const getMovieUrl = (movie) => {
-    return `${SITE_URL}/movie/${movie.slug}`;
-  }
-
-  // FIXED Structured Data for Movie Collection with PROPER URLS
-  const movieCollectionStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Latest Movies Collection",
-    "description": "Collection of movies available on demand",
-    "url": canonicalUrl,
-    "numberOfItems": movies.length,
-    "itemListElement": movies.slice(0, 10).map((movie, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": getMovieUrl(movie),
-      "item": {
-        "@type": "Movie",
-        "name": movie.title,
-        "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": getMovieUrl(movie),
-        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
-        "dateCreated": movie.releaseYear || movie.year,
-        "genre": movie.genre || movie.category,
-        "duration": movie.duration,
-        "contentRating": movie.rating
-      }
-    }))
-  }
-
-  // FIXED Structured Data for Hero Movies Carousel with PROPER URLS
-  const heroMoviesStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Featured Movies",
-    "description": "Featured movies carousel",
-    "url": canonicalUrl,
-    "numberOfItems": heroMovies.length,
-    "itemListElement": heroMovies.map((movie, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": getMovieUrl(movie),
-      "item": {
-        "@type": "Movie",
-        "name": movie.title,
-        "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": getMovieUrl(movie),
-        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
-        "dateCreated": movie.releaseYear || movie.year,
-        "genre": movie.genre || movie.category,
-        "duration": movie.duration,
-        "contentRating": movie.rating
-      }
-    }))
-  }
-
-  // FIXED Structured Data for Latest Movies Grid with PROPER URLS
-  const latestMoviesStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Latest Movies",
-    "description": "Latest movies collection",
-    "url": canonicalUrl,
-    "numberOfItems": displayedLatestMovies.length,
-    "itemListElement": displayedLatestMovies.map((movie, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": getMovieUrl(movie),
-      "item": {
-        "@type": "Movie",
-        "name": movie.title,
-        "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": getMovieUrl(movie),
-        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
-        "dateCreated": movie.releaseYear || movie.year,
-        "genre": movie.genre || movie.category,
-        "duration": movie.duration,
-        "contentRating": movie.rating
-      }
-    }))
-  }
-
-  // FIXED Structured Data for All Movies Grid with PROPER URLS
-  const allMoviesStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "All Movies",
-    "description": "Complete movie collection",
-    "url": canonicalUrl,
-    "numberOfItems": displayedAllMovies.length,
-    "itemListElement": displayedAllMovies.map((movie, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": getMovieUrl(movie),
-      "item": {
-        "@type": "Movie",
-        "name": movie.title,
-        "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": getMovieUrl(movie),
-        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
-        "dateCreated": movie.releaseYear || movie.year,
-        "genre": movie.genre || movie.category,
-        "duration": movie.duration,
-        "contentRating": movie.rating
-      }
-    }))
   }
 
   // Organization Structured Data
@@ -1153,20 +1043,6 @@ export default function Home({ movies }) {
         "item": canonicalUrl
       }
     ]
-  }
-
-  // Website Structured Data
-  const websiteStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": siteName,
-    "description": siteDescription,
-    "url": canonicalUrl,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": `${canonicalUrl}/?search={search_term_string}`,
-      "query-input": "required name=search_term_string"
-    }
   }
 
   return (
@@ -1215,38 +1091,6 @@ export default function Home({ movies }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(websiteStructuredData)
-          }}
-        />
-
-        {/* Structured Data for Movie Collection */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(movieCollectionStructuredData)
-          }}
-        />
-
-        {/* Structured Data for Hero Movies Carousel */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(heroMoviesStructuredData)
-          }}
-        />
-
-        {/* Structured Data for Latest Movies Grid */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(latestMoviesStructuredData)
-          }}
-        />
-
-        {/* Structured Data for All Movies Grid */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(allMoviesStructuredData)
           }}
         />
 
@@ -1424,7 +1268,7 @@ export default function Home({ movies }) {
               {/* Latest Movies Section */}
               <div className="max-w-6xl mx-auto mb-12">
                 <MovieGrid movies={displayedLatestMovies} title="Latest Movies" />
-                {latestMoviesLimit < gridMovies.length && (
+                {/* {latestMoviesLimit < gridMovies.length && (
                   <div className="text-center mt-8">
                     <button
                       onClick={loadMoreLatest}
@@ -1433,7 +1277,7 @@ export default function Home({ movies }) {
                       Load More Latest Movies ({gridMovies.length - displayedLatestMovies.length} more)
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* All Movies Section */}
