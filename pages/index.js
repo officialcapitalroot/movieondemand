@@ -1021,7 +1021,12 @@ export default function Home({ movies }) {
     return `${SITE_URL}/${thumbnail}`;
   }
 
-  // Fixed Structured Data for Movie Collection with URL
+  // Generate movie URL
+  const getMovieUrl = (movie) => {
+    return `${SITE_URL}/movie/${movie.slug}`;
+  }
+
+  // FIXED Structured Data for Movie Collection with PROPER URLS
   const movieCollectionStructuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -1032,12 +1037,12 @@ export default function Home({ movies }) {
     "itemListElement": movies.slice(0, 10).map((movie, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "url": getMovieUrl(movie),
       "item": {
         "@type": "Movie",
         "name": movie.title,
         "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "url": getMovieUrl(movie),
         "image": getAbsoluteThumbnailUrl(movie.thumbnail),
         "dateCreated": movie.releaseYear || movie.year,
         "genre": movie.genre || movie.category,
@@ -1047,7 +1052,7 @@ export default function Home({ movies }) {
     }))
   }
 
-  // Structured Data for Hero Movies Carousel
+  // FIXED Structured Data for Hero Movies Carousel with PROPER URLS
   const heroMoviesStructuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -1058,12 +1063,12 @@ export default function Home({ movies }) {
     "itemListElement": heroMovies.map((movie, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "url": getMovieUrl(movie),
       "item": {
         "@type": "Movie",
         "name": movie.title,
         "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "url": getMovieUrl(movie),
         "image": getAbsoluteThumbnailUrl(movie.thumbnail),
         "dateCreated": movie.releaseYear || movie.year,
         "genre": movie.genre || movie.category,
@@ -1073,7 +1078,7 @@ export default function Home({ movies }) {
     }))
   }
 
-  // Structured Data for Latest Movies Grid
+  // FIXED Structured Data for Latest Movies Grid with PROPER URLS
   const latestMoviesStructuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -1084,12 +1089,12 @@ export default function Home({ movies }) {
     "itemListElement": displayedLatestMovies.map((movie, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "url": getMovieUrl(movie),
       "item": {
         "@type": "Movie",
         "name": movie.title,
         "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "url": getMovieUrl(movie),
         "image": getAbsoluteThumbnailUrl(movie.thumbnail),
         "dateCreated": movie.releaseYear || movie.year,
         "genre": movie.genre || movie.category,
@@ -1099,7 +1104,7 @@ export default function Home({ movies }) {
     }))
   }
 
-  // Structured Data for All Movies Grid
+  // FIXED Structured Data for All Movies Grid with PROPER URLS
   const allMoviesStructuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -1110,12 +1115,12 @@ export default function Home({ movies }) {
     "itemListElement": displayedAllMovies.map((movie, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "url": getMovieUrl(movie),
       "item": {
         "@type": "Movie",
         "name": movie.title,
         "description": movie.description || `Watch ${movie.title} online for free`,
-        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "url": getMovieUrl(movie),
         "image": getAbsoluteThumbnailUrl(movie.thumbnail),
         "dateCreated": movie.releaseYear || movie.year,
         "genre": movie.genre || movie.category,
