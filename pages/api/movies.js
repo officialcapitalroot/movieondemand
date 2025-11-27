@@ -199,39 +199,63 @@ import path from 'path'
 
 const dataFilePath = path.join(process.cwd(), 'data', 'data.json')
 
-// Simple rate limiting example
-const rateLimit = require('express-rate-limit');
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
+// Simple in-memory rate limiting (no external dependency)
+const requestCounts = new Map();
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per window
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  
+  if (!requestCounts.has(ip)) {
+    requestCounts.set(ip, []);
+  }
+  
+  const requests = requestCounts.get(ip);
+  // Remove old requests outside the current window
+  while (requests.length > 0 && requests[0] <= windowStart) {
+    requests.shift();
+  }
+  
+  // Check if under rate limit
+  if (requests.length >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  // Add current request
+  requests.push(now);
+  return true;
+}
 
 export default function handler(req, res) {
   const { method } = req
+  
+  // Get client IP
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = forwarded ? forwarded.split(',')[0] : req.socket.remoteAddress;
+  
+  // Check rate limit
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ 
+      success: false, 
+      error: 'Too many requests, please try again later.' 
+    });
+  }
 
-  // Apply rate limiting to all methods
-  limiter(req, res, (err) => {
-    if (err) {
-      return res.status(429).json({ 
-        success: false, 
-        error: 'Too many requests, please try again later.' 
-      })
-    }
-
-    switch (method) {
-      case 'GET':
-        return getMovies(req, res)
-      case 'POST':
-        return createMovie(req, res)
-      case 'PUT':
-        return updateMovie(req, res)
-      case 'DELETE':
-        return deleteMovie(req, res)
-      default:
-        res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
-        res.status(405).end(`Method ${method} Not Allowed`)
-    }
-  })
+  switch (method) {
+    case 'GET':
+      return getMovies(req, res)
+    case 'POST':
+      return createMovie(req, res)
+    case 'PUT':
+      return updateMovie(req, res)
+    case 'DELETE':
+      return deleteMovie(req, res)
+    default:
+      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
+      res.status(405).end(`Method ${method} Not Allowed`)
+  }
 }
 
 function getMovies(req, res) {
