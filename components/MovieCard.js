@@ -24,7 +24,10 @@ export default function MovieCard({ movie }) {
             quality={100}
             priority
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
+            style={{
+                   filter: 'brightness(1.05) contrast(1.15) saturate(1.12) hue-rotate(1deg)'
+                   }}         
+         />
           
           {isHovered && (
             <>

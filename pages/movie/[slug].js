@@ -1212,6 +1212,9 @@ export default function MoviePage({ movie }) {
                         className="object-cover hover:scale-105 transition-transform duration-300"
                         priority
                         onError={handleImageError}
+                        style={{
+                            filter: 'brightness(1.05) contrast(1.15) saturate(1.12) hue-rotate(1deg)'
+                             }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-800 flex items-center justify-center">
