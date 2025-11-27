@@ -862,6 +862,41 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import Head from 'next/head'
 import Header from '../components/Header'
 import HeroSection from '../components/HeroSection'
@@ -871,10 +906,12 @@ import moviesData from '../data/data.json'
 import { useState, useMemo } from 'react'
 import { Search, Filter, X } from 'lucide-react'
 
+const SITE_URL = 'https://movieondemand.vercel.app'
+
 export default function Home({ movies }) {
   const heroMovies = movies.slice(0, 5)
   const gridMovies = movies.slice(5)
-  const canonicalUrl = 'https://movieondemand.vercel.app'
+  const canonicalUrl = SITE_URL
   const siteName = 'Movie On Demand'
   const siteDescription = 'Movie On Demand Service - Request any movie via Telegram by sending movie name, year, and language. We add requested movies within 24 hours.'
 
@@ -969,24 +1006,121 @@ export default function Home({ movies }) {
     setSearchResultsLimit(prev => prev + 15)
   }
 
-  // Fixed Structured Data for Movie Collection
+  // Generate absolute thumbnail URL
+  const getAbsoluteThumbnailUrl = (thumbnail) => {
+    if (!thumbnail) return `${SITE_URL}/fallback-image.jpg`;
+    
+    if (thumbnail.startsWith('http')) {
+      return thumbnail;
+    }
+    
+    if (thumbnail.startsWith('/')) {
+      return `${SITE_URL}${thumbnail}`;
+    }
+    
+    return `${SITE_URL}/${thumbnail}`;
+  }
+
+  // Fixed Structured Data for Movie Collection with URL
   const movieCollectionStructuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "name": "Latest Movies Collection",
     "description": "Collection of movies available on demand",
+    "url": canonicalUrl,
     "numberOfItems": movies.length,
     "itemListElement": movies.slice(0, 10).map((movie, index) => ({
       "@type": "ListItem",
       "position": index + 1,
+      "url": `${SITE_URL}/movie/${movie.slug}`,
       "item": {
         "@type": "Movie",
-        "name": movie.title || "Movie",
-        "description": movie.description || "Movie description",
-        "image": movie.thumbnail || `${canonicalUrl}/default-movie.jpg`,
-        "dateCreated": movie.releaseYear || movie.year || "2024",
-        "genre": movie.genre || movie.category || "Movie",
-        "duration": movie.duration || "PT2H"
+        "name": movie.title,
+        "description": movie.description || `Watch ${movie.title} online for free`,
+        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
+        "dateCreated": movie.releaseYear || movie.year,
+        "genre": movie.genre || movie.category,
+        "duration": movie.duration,
+        "contentRating": movie.rating
+      }
+    }))
+  }
+
+  // Structured Data for Hero Movies Carousel
+  const heroMoviesStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Featured Movies",
+    "description": "Featured movies carousel",
+    "url": canonicalUrl,
+    "numberOfItems": heroMovies.length,
+    "itemListElement": heroMovies.map((movie, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "item": {
+        "@type": "Movie",
+        "name": movie.title,
+        "description": movie.description || `Watch ${movie.title} online for free`,
+        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
+        "dateCreated": movie.releaseYear || movie.year,
+        "genre": movie.genre || movie.category,
+        "duration": movie.duration,
+        "contentRating": movie.rating
+      }
+    }))
+  }
+
+  // Structured Data for Latest Movies Grid
+  const latestMoviesStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Latest Movies",
+    "description": "Latest movies collection",
+    "url": canonicalUrl,
+    "numberOfItems": displayedLatestMovies.length,
+    "itemListElement": displayedLatestMovies.map((movie, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "item": {
+        "@type": "Movie",
+        "name": movie.title,
+        "description": movie.description || `Watch ${movie.title} online for free`,
+        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
+        "dateCreated": movie.releaseYear || movie.year,
+        "genre": movie.genre || movie.category,
+        "duration": movie.duration,
+        "contentRating": movie.rating
+      }
+    }))
+  }
+
+  // Structured Data for All Movies Grid
+  const allMoviesStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "All Movies",
+    "description": "Complete movie collection",
+    "url": canonicalUrl,
+    "numberOfItems": displayedAllMovies.length,
+    "itemListElement": displayedAllMovies.map((movie, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "url": `${SITE_URL}/movie/${movie.slug}`,
+      "item": {
+        "@type": "Movie",
+        "name": movie.title,
+        "description": movie.description || `Watch ${movie.title} online for free`,
+        "url": `${SITE_URL}/movie/${movie.slug}`,
+        "image": getAbsoluteThumbnailUrl(movie.thumbnail),
+        "dateCreated": movie.releaseYear || movie.year,
+        "genre": movie.genre || movie.category,
+        "duration": movie.duration,
+        "contentRating": movie.rating
       }
     }))
   }
@@ -1084,6 +1218,30 @@ export default function Home({ movies }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(movieCollectionStructuredData)
+          }}
+        />
+
+        {/* Structured Data for Hero Movies Carousel */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(heroMoviesStructuredData)
+          }}
+        />
+
+        {/* Structured Data for Latest Movies Grid */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(latestMoviesStructuredData)
+          }}
+        />
+
+        {/* Structured Data for All Movies Grid */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(allMoviesStructuredData)
           }}
         />
 
